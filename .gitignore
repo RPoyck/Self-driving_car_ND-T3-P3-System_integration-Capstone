@@ -1,6 +1,37 @@
 *.py[cod]
 
-build
-devel
+### ROS ###
+logs/
+build/
+devel/
+.catkin_tools/
+bin/
+lib/
+msg_gen/
+srv_gen/
 
 profile.tmp
+
+# Ignore generated docs
+*.dox
+*.wikidoc
+
+# eclipse stuff
+.project
+.cproject
+
+# qcreator stuff
+CMakeLists.txt.user
+qtcreator-*
+
+# Emacs
+.#*
+
+# Catkin custom files
+CATKIN_IGNORE
+
+# KDevelop IDE stuff
+*.kdev4
+*.kate-swp
+
+
