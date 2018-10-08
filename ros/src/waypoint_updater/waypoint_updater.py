@@ -94,24 +94,60 @@ class WaypointUpdater(object):
 		return closest_idx
 
 
-	def publish_waypoints(self, closest_idx):
-		lane = Lane()
-		#lane.header = self.base_waypoints.header
-		lane.waypoints = self.base_waypoints.waypoints[closest_idx: (closest_idx + LOOKAHEAD_WPS)]
-		self.final_waypoints_pub.publish(lane)
-		
-	
+	#def publish_waypoints(self, closest_idx):
+		#lane = Lane()
+		##lane.header = self.base_waypoints.header
+		#lane.waypoints = self.base_waypoints.waypoints[closest_idx: (closest_idx + LOOKAHEAD_WPS)]
+		#self.final_waypoints_pub.publish(lane)
+	def publish_waypoints(self):
+		final_lane = self.generate_lane()
+		self.final_waypoints_pub.publish(final_lane)
+
+
 	def generate_lane(self):
 		lane = Lane()
 		
+		# Get the base waypoints for the coming time-step #
 		closest_idx = self.get_closest_waypoint_idx()
 		farthest_idx = closest_idx + LOOKAHEAD_WPS
 		base_waypoints = self.base_lane.waypoints[closest_idx:farthest_idx]
 		
+		# If no traffic sign is detected or the detected sign is out of path planning reach, return the base waypoints #
 		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
 			lane.waypoints = base_waypoints
+		# If a traffic sign is detected within range give the base waypoints to the waypoint manipulation function@
 		else:
 			lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
+		
+		return lane
+
+
+	def decelerate_waypoints(self, waypoints, closest_idx):
+		# Make a new list of waypoints in order to store the manipulated base waypoints #
+		temp = []
+		for i, wp in enumerate(waypoints):
+			
+			
+			p = Waypoint()
+			# The goal position and orientation of the vehicle at the waypoint remains the same #
+			p.pose = wp.pose
+			
+			# TODO: Make the following happen outside of this loop? #
+			# TODO: Make this work for the first 2 waypoints as well, in stead of setting to 0? #
+			stop_idx = max(self.stopline_wp_idx - closest_idx - 2, 0) # Two waypoints back from line so front of car stops at the line approximately #
+			# Calculate the distance between this waypoint and the index at which the vehicle has to come to a standstill #
+			dist = self.distance(waypoints, i, stop_idx)
+			# Calculate the velocity the vehicle has to have at this waypoint to come to a standstill in time #
+			# TODO: Replace by a linear function? #
+			vel = math.sqrt(2.0 * MAX_DECEL * dist)
+			if vel < 1.0:
+				vel = 0.0
+			
+			# Use the calculated required waypoint velocity in stead of the original/base waypoint velocity, unless the base waypoint velocity is smaller than this value #
+			p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+			temp.append(p)
+
+		return temp
 
 
 	def get_waypoint_velocity(self, waypoint):
@@ -129,6 +165,14 @@ class WaypointUpdater(object):
 			dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
 			wp1 = i
 		return dist
+
+
+	def get_waypoint_velocity(self, waypoint):
+		return waypoint.twist.twist.linear.x
+
+
+	def set_waypoint_velocity(self, waypoints, waypoint, velocity):
+		waypoints[waypoint].twist.twist.linear.x = velocity
 
 
 	#------------------#
@@ -150,7 +194,7 @@ class WaypointUpdater(object):
 			
 	def traffic_cb(self, msg):
 		# TODO: Callback for /traffic_waypoint message. Implement
-		pass
+		self.stopline_wp_idx = msg.data
 	
 
 	def obstacle_cb(self, msg):
