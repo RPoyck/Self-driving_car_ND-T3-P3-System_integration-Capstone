@@ -108,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES waypoint_updater
-#  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs styx_msgs styx_utils
+ CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs styx_msgs # styx_utils
 #  DEPENDS system_lib
 )
 

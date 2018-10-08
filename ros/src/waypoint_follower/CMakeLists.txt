@@ -8,6 +8,7 @@ project(waypoint_follower)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+    rospy
     roscpp
     std_msgs
     pcl_ros
@@ -15,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     styx_msgs
     tf
+    geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -77,7 +79,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES libwaypoint_follower
-  CATKIN_DEPENDS roscpp std_msgs tf geometry_msgs styx_msgs
+  CATKIN_DEPENDS rospy roscpp std_msgs tf geometry_msgs styx_msgs geometry_msgs
 )
 
 ###########

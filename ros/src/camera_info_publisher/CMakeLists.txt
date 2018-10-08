@@ -107,6 +107,7 @@ catkin_package(
 #  LIBRARIES camera_info_publisher
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
+ CATKIN_DEPENDS rospy std_msgs
 )
 
 ###########
