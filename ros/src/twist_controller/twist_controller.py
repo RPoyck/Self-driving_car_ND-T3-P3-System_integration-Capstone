@@ -68,7 +68,7 @@ class Controller(object): #def __init__(self, *args, **kwargs):
 		# If the requested velocity is smaller than the current velocity, apply the brakes with a factor depending on the required deceleration and maximum deceleration #
 		elif throttle < 0.1 and vel_error < 0.0:
 			throttle = 0.0
-			decel = max(vel_error, self.devel_limit)
+			decel = max(vel_error, self.decel_limit)
 			brake = abs(decel) * self.vehicle_mass * self.wheel_radius # [N*m] Torque #
 
 		return throttle, brake, steering
