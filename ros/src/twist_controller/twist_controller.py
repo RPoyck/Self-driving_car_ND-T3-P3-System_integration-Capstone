@@ -10,13 +10,51 @@ ONE_MPH = 0.44704
 class Controller(object): #def __init__(self, *args, **kwargs):
 	def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, decel_limit,
 			  accel_limit, wheel_radius, wheel_base, steer_ratio, max_lat_accel, max_steer_angle):
-		# TODO: Implement
 		self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
 
 		# Parameters for the throttle control PID controller #
 		kp = 0.3
+		#kp = 1.0
+		#kp = 1.5
+		#kp = 0.5
+		#kp = 0.2
+		#kp = 0.05
+		#kp = 0.02
+		#kp = 0.03
+		#kp = 0.045
+		#kp = 0.035
+		#kp = 0.03
+		#kp = 0.027
+		#kp = 0.02
+		#kp = 0.5
+		#kp = 0.035
+
 		ki = 0.1
+		#ki = 0.3
+		#ki = 0.0
+		#ki = 0.02
+		#ki = 0.005
+		#ki = 0.01
+		#ki = 0.005
+		#ki = 0.008
+		#ki = 0.007
+		#ki = 0.006
+		#ki = 0.0055
+		#ki = 0.005
+		#ki = 0.003
+		#ki = 0.004
+		#ki = 0.0045
+		#ki = 0.003
+		#ki = 0.0
+		
 		kd = 0.0
+		#kd = 0.04
+		#kd = 0.0
+		#kd = 0.005
+		#kd = 0.001
+		#kd = 0.0005
+		#kd = 0.0
+		
 		mn = 0.0 # Minimum throttle value #
 		mx = 0.2 # Maximum throttle value #
 		self.throttle_controller = PID(kp, ki, kd, mn, mx)
@@ -32,10 +70,9 @@ class Controller(object): #def __init__(self, *args, **kwargs):
 		self.decel_limit = decel_limit
 		self.accel_limit = accel_limit
 		self.wheel_radius = wheel_radius
-		
 		self.last_time = rospy.get_time()
 
-	#def control(self, *args, **kwargs):
+
 	def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
 		# TODO: Change the arg, kwarg list to suit your needs
 		# Return throttle, brake, steer
