@@ -108,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES twist_controller
-#  CATKIN_DEPENDS dbw_mkz_msgs geometry_msgs roscpp rospy std_msgs
+ CATKIN_DEPENDS dbw_mkz_msgs geometry_msgs roscpp rospy std_msgs styx_msgs
 #  DEPENDS system_lib
 )
 
