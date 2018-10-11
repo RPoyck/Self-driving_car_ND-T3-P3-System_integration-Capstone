@@ -109,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES styx
-#  CATKIN_DEPENDS dbw_mkz_msgs geometry_msgs roscpp rospy sensor_msgs std_msgs
+ CATKIN_DEPENDS dbw_mkz_msgs geometry_msgs roscpp rospy sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 
