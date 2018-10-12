@@ -199,7 +199,7 @@ class TLDetector(object):
                 diff = d
                 closest_light = light
                 light_wp_idx = temp_wp_idx
-	"""
+	
         if closest_light:
 	    #print('closest light ------- : ', closest_light)
 	    self.time_start = time.time()
@@ -213,7 +213,7 @@ class TLDetector(object):
 	    #print('prediction nr. : ' , self.counter)
 	    #print('benoetigte Zeit: ', elapsed_time)
 	    return light_wp_idx, state
-	"""
+	
 	self.time_end = time.time()
         elapsed_time = 0
         elapsed_time = self.time_end -self.time_start
