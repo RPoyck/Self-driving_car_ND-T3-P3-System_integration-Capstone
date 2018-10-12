@@ -44,7 +44,7 @@ class TLClassifier(object):
         """
         #start = timer()
 
-        print('--------------------------- trying to classify')
+        #print('--------------------------- trying to classify')
         
         with self.graph.as_default():
             img_expand = np.expand_dims(image, axis=0)

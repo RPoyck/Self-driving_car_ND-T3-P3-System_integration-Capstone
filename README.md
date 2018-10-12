@@ -2,6 +2,14 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
+
+## Team members:
+Team Lead: Dennis Zeipert Dennis.Zeipert@streetscooter.eu
+Rob Poyck Rob.Poyck@streetscooter.eu
+Marco Bellof Marco.Bellof@streetscooter.eu
+ 
+
+
 ### Native Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).

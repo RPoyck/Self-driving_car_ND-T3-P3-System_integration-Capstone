@@ -70,8 +70,8 @@ class WaypointUpdater(object):
 		
 		# Get the ID of the one waypoint which is closest to the vehicle position #
 		closest_idx = self.waypoint_tree.query([x_veh, y_veh], 1)[1]
-		print("Closest_idx: ", closest_idx, "\n")	# Testing and debug output #
-		print( "len(self.base_waypoints.waypoints): ", len(self.base_waypoints.waypoints) )	# Testing and debug output #
+		#print("Closest_idx: ", closest_idx, "\n")	# Testing and debug output #
+		#print( "len(self.base_waypoints.waypoints): ", len(self.base_waypoints.waypoints) )	# Testing and debug output #
 		
 		# Check if this closest waypoint is ahead or behind the vehicle #
 		closest_coord = self.waypoints_2d[closest_idx]
