@@ -10,6 +10,7 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import yaml
 from scipy.spatial import KDTree
+import time
 
 STATE_COUNT_THRESHOLD = 2 # threshold to eliminate false positives
 
@@ -25,7 +26,11 @@ class TLDetector(object):
         self.lights = []
         self.waypoints_2d = None
         self.waypoints_tree = None
-        
+ 	self.image_count = 0       
+	self.time_start = 0
+	self.time_end = 0 
+	self.counter = 0
+
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
@@ -43,7 +48,7 @@ class TLDetector(object):
         config_string = rospy.get_param("/traffic_light_config")
         self.config = yaml.load(config_string)
         self.is_site = self.config["is_site"]
-        print("Is Site %d" % self.is_site)
+        #print("Is Site %d" % self.is_site)
         
         self.upcoming_red_light_pub = rospy.Publisher(
             '/traffic_waypoint', Int32, queue_size=1)
@@ -71,10 +76,15 @@ class TLDetector(object):
         return [position.x, position.y]
 
     def waypoints_cb(self, waypoints):
+	self.time_start = time.time()
         self.waypoints = waypoints
         if not self.waypoints_2d:
             self.waypoints_2d = [self.waypoint_pose(waypoint) for waypoint in waypoints.waypoints]
             self.waypoints_tree = KDTree(self.waypoints_2d)
+	self.time_end = time.time()
+	elapsed_time = 0
+	elapsed_time = self.time_end - self.time_start
+	#print('waypoints_cb runtime : ', elapsed_time)
 
     def traffic_cb(self, msg):
         self.lights = msg.lights
@@ -85,32 +95,45 @@ class TLDetector(object):
         Args:
             msg (Image): image from car-mounted camera
         """
-        
-        #print('image received')
-        self.has_image = True
-        self.camera_image = msg
-            
-        if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
-            light_wp, state = self.process_traffic_lights()
+	self.time_start = time.time()	
 
-            if self.state != state:
-                self.state_count = 0
-                self.state = state
-            elif self.state_count >= STATE_COUNT_THRESHOLD:
-                self.last_state = self.state
-                light_wp = light_wp if state == TrafficLight.RED else -1
-                self.last_wp = light_wp
-                self.upcoming_red_light_pub.publish(Int32(light_wp))
-                print('pub : ', light_wp)
-            else:
-                self.upcoming_red_light_pub.publish(Int32(self.last_wp))
-            self.state_count += 1
-        elif self.pose is None:
-            print('pose is none')
-        elif self.waypoints is None:
-            print('waypoints is none')
-        elif self.camera_image is None:
-            print('camera image is none')
+        if (self.image_count == 4):
+		self.image_count = 0
+       
+	
+		#print('image received : ', self.image_count)
+        	self.has_image = True
+        	self.camera_image = msg
+            
+        	if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
+            		light_wp, state = self.process_traffic_lights()
+
+            		if self.state != state:
+                		self.state_count = 0
+                		self.state = state
+            		elif self.state_count >= STATE_COUNT_THRESHOLD:
+                		self.last_state = self.state
+                		light_wp = light_wp if state == TrafficLight.RED else -1
+                		self.last_wp = light_wp
+                		self.upcoming_red_light_pub.publish(Int32(light_wp))
+                		#print('pub : ', light_wp)
+            		else:
+                		self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            		self.state_count += 1
+        	elif self.pose is None:
+            		print('pose is none')
+        	elif self.waypoints is None:
+            		print('waypoints is none')
+        	elif self.camera_image is None:
+            		print('camera image is none')
+	else:
+		#print("-----------------image_count deleted")
+                self.image_count += 1
+	
+        self.time_end = time.time()
+	elapsed_time = 0
+	elapsed_time = self.time_end -self.time_start
+	#print('image_cb runtime : ', elapsed_time)
 
     def get_closest_waypoint(self, pose_x, pose_y):
         """Identifies the closest path waypoint to the given position
@@ -120,8 +143,13 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
         """
         #Use KDTree to search through waypoints
+	self.time_start = time.time()
         closest_idx = self.waypoints_tree.query([pose_x, pose_y], 1)[1]
-        return closest_idx
+        self.time_end = time.time()
+	elapsed_time = 0
+	elapsed_time = self.time_end - self.time_start
+	#print('get_closest_waypoint runtime : ', elapsed_time)
+	return closest_idx
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -130,12 +158,13 @@ class TLDetector(object):
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
         """
+
         if(not self.has_image):
             self.prev_light_loc = None
             return False
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-        
+	#print('--------------------------classifier aufgerufen----------------')        
         #Get classification from SSD
         return self.light_classifier.get_classification(cv_image) 
         #return light.state
@@ -150,6 +179,7 @@ class TLDetector(object):
         closest_light = None
         light_wp_idx = None
         
+	self.time_start = time.time()
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
@@ -169,12 +199,25 @@ class TLDetector(object):
                 diff = d
                 closest_light = light
                 light_wp_idx = temp_wp_idx
-
+	"""
         if closest_light:
-            state = self.get_light_state(closest_light)
-            print("Light waypoint Index: ",light_wp_idx, "Traffic Light: ",TrafficLight.RED, state)
-            return light_wp_idx, state
-
+	    #print('closest light ------- : ', closest_light)
+	    self.time_start = time.time()
+            #print('closest light')
+	    state = self.get_light_state(closest_light)
+            #print("Light waypoint Index: ",light_wp_idx, "Traffic Light: ",TrafficLight.RED, state)
+            self.time_end = time.time()
+	    elapsed_time = 0
+            elapsed_time = self.time_end - self.time_start
+ 	    self.counter += 1
+	    #print('prediction nr. : ' , self.counter)
+	    #print('benoetigte Zeit: ', elapsed_time)
+	    return light_wp_idx, state
+	"""
+	self.time_end = time.time()
+        elapsed_time = 0
+        elapsed_time = self.time_end -self.time_start
+        #print('----------------process traffic lights runtime  : ', elapsed_time)
         return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':

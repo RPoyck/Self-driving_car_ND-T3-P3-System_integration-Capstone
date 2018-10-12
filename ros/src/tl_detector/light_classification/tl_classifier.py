@@ -2,6 +2,7 @@ from styx_msgs.msg import TrafficLight
 import tensorflow as tf
 import numpy as np
 import datetime
+#from timeit import default_timer as timer
 
 class TLClassifier(object):
     def __init__(self, is_site):
@@ -41,8 +42,9 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        
-        print('trying to classify')
+        #start = timer()
+
+        print('--------------------------- trying to classify')
         
         with self.graph.as_default():
             img_expand = np.expand_dims(image, axis=0)
@@ -71,4 +73,7 @@ class TLClassifier(object):
         else:
             print('no classification above threshold')
 
-        return TrafficLight.UNKNOWN
+        #end = timer()
+	elapsed_time = end - start
+	#print("--------------------------------------------  --------------  benoetigte Zeit : " ,elapsed_time)
+	return TrafficLight.UNKNOWN
